@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:ada_lovelace/core/logger.dart';
 import 'package:ada_lovelace/core/theme.dart';
 import 'package:ada_lovelace/data-domain/providers/theme_provider.dart';
 import 'package:ada_lovelace/presentation/screens/add_task_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -18,11 +21,31 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   bool _isDoneVisible = true;
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    _scrollController = ScrollController();
+    _scrollController.addListener(_scrollListener);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final theme = AppTheme.of(context);
+    // if (_scrollController.hasClients) print(_scrollController.offset);
     return Scaffold(
       backgroundColor: theme.backPrimary,
       body: Consumer<DatabaseProvider>(
@@ -38,6 +61,7 @@ class _MainScreenState extends State<MainScreen> {
             }
           }
           return CustomScrollView(
+            controller: _scrollController,
             slivers: [
               SliverAppBar(
                 pinned: true,
@@ -45,44 +69,58 @@ class _MainScreenState extends State<MainScreen> {
                 floating: false,
                 expandedHeight: 80.0,
                 backgroundColor: theme.backPrimary,
-                flexibleSpace: FlexibleSpaceBar(
-                  titlePadding: const EdgeInsets.only(left: 60),
-                  title: Row(
-                    children: [
-                      // const SizedBox(width: 16),
-                      Text(
-                        'Мои дела',
-                        style: theme.largeTitle.copyWith(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
+                actions: [
+                  if (_scrollController.hasClients &&
+                      _scrollController.offset > 50)
+                    Opacity(
+                      opacity: min(1, (_scrollController.offset - 50) / 30),
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(32),
+                          onTap: () {
+                            setState(() {
+                              Logger.addToLog('toggled done visibility');
+                              _isDoneVisible = !_isDoneVisible;
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Icon(
+                              _isDoneVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: theme.primary,
+                            ),
+                          ),
                         ),
                       ),
-                      // const Spacer(),
-                    ],
+                    ),
+                ],
+                flexibleSpace: FlexibleSpaceBar(
+                  expandedTitleScale: 1.6,
+                  titlePadding: EdgeInsets.only(
+                      left: _scrollController.hasClients
+                          ? max(min(60 - _scrollController.offset * 0.66, 60), 16)
+                          : 60),
+                  title: Padding(
+                    padding: EdgeInsets.only(
+                        bottom: _scrollController.hasClients
+                            ? max(min(_scrollController.offset, 16), 0)
+                            : 0),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Мои дела',
+                          style: theme.largeTitle.copyWith(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                // Text(
-                //   'Мои дела',
-                //   style: theme.largeTitle.copyWith(
-                //     fontSize: 24,
-                //     fontWeight: FontWeight.w600,
-                //   ),
-                // ),
-                // bottom: PreferredSize(
-                //   preferredSize: Size.fromHeight(20),
-                //   child: Row(
-                //     children: [
-                //       const SizedBox(width: 60),
-                //       Text(
-                //         'Мои дела',
-                //         style: theme.largeTitle.copyWith(
-                //           fontSize: 32,
-                //           fontWeight: FontWeight.w600,
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
               ),
               SliverToBoxAdapter(
                 child: Padding(
@@ -92,8 +130,7 @@ class _MainScreenState extends State<MainScreen> {
                       const SizedBox(width: 60),
                       Text(
                         'Выполнено — ${value.countDone()}',
-                        style: theme.body
-                            .copyWith(color: theme.labelTertiary),
+                        style: theme.body.copyWith(color: theme.labelTertiary),
                       ),
                       const Spacer(),
                       InkWell(
