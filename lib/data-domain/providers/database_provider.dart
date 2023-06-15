@@ -56,9 +56,19 @@ class DatabaseProvider extends ChangeNotifier {
 
   void deleteTask(String id) {
     tasks.remove(id);
+    notifyListeners();
   }
 
   void toggleDone(String id) {
     tasks[id]!.done = !tasks[id]!.done;
+    notifyListeners();
+  }
+
+  int countDone() {
+    int res = 0;
+    for (var item in tasks.values) {
+      res += item.done ? 1 : 0;
+    }
+    return res;
   }
 }

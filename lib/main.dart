@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'TODO:',
           theme: provider.currentTheme == ThemeType.light
-              ? AppTheme.lightTheme()
+              ? AppTheme.lightTheme() 
               : AppTheme.darkTheme(),
           home: const MainScreen(),
           routes: <String, WidgetBuilder>{

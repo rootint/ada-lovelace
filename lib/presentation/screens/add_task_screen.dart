@@ -30,7 +30,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
   @override
   void initState() {
-    _date = DateTime.now();
     super.initState();
   }
 
@@ -53,7 +52,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       setState(() {
         _controller.text = task.text;
         _date = task.doUntil;
-        _isDateSelected = true;
+        _isDateSelected = _date != null;
         _dropdownValue = reverseConversionMap[task.importance]!;
       });
       firstBuild = false;
@@ -77,14 +76,18 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: TextButton(
-              onPressed: () {
-                saveTask(id);
-                Navigator.of(context).pop();
-              },
+              onPressed: _controller.text.isEmpty
+                  ? null
+                  : () {
+                      saveTask(id);
+                      Navigator.of(context).pop();
+                    },
               child: Text(
                 'СОХРАНИТЬ',
                 style: AppColors.button.copyWith(
-                  color: AppColors.primary,
+                  color: _controller.text.isEmpty
+                      ? AppColors.labelDisabled
+                      : AppColors.primary,
                 ),
               ),
             ),
@@ -114,6 +117,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                         color: AppColors.labelTertiary,
                       ),
                     ),
+                    onChanged: (_) => setState(() {}),
                     minLines: 4,
                     maxLines: null,
                   ),
@@ -172,7 +176,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                         'Сделать до',
                         style: AppColors.body,
                       ),
-                      if (_isDateSelected)
+                      if (_isDateSelected && _date != null)
                         Text(
                           DateFormat('d.MM.y').format(_date!),
                           style: AppColors.subhead
@@ -192,6 +196,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                             // lastDate: DateTime(DateTime.now().year + 100),
                             lastDate: DateTime(2300),
                           ).then((value) => setState(() => _date = value));
+                        } else {
+                          _date = null;
                         }
                         _isDateSelected = value;
                       });
@@ -203,7 +209,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               const Separator(),
               const SizedBox(height: 20),
               InkWell(
-                onTap: () {},
+                onTap: id == null ? null : () {
+                  databaseProvider.deleteTask(id);
+                  Navigator.of(context).pop();
+                },
                 highlightColor: AppColors.error.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
                 child: Padding(
@@ -213,12 +222,18 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     children: [
                       Icon(
                         Icons.delete,
-                        color: AppColors.error,
+                        color: id == null
+                            ? AppColors.labelDisabled
+                            : AppColors.error,
                       ),
                       const SizedBox(width: 12),
                       Text(
                         'Удалить',
-                        style: AppColors.body.copyWith(color: AppColors.error),
+                        style: AppColors.body.copyWith(
+                          color: id == null
+                              ? AppColors.labelDisabled
+                              : AppColors.error,
+                        ),
                       ),
                     ],
                   ),

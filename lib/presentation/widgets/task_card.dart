@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/theme.dart';
@@ -20,11 +21,18 @@ class TaskCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Dismissible(
         key: Key(task.id),
-        onDismissed: (direction) {
+        confirmDismiss: (direction) async {
           if (direction == DismissDirection.startToEnd) {
+            taskProvider.toggleDone(task.id);
+            return false;
+          }
+          return true;
+        },
+        onDismissed: (direction) {
+          if (direction == DismissDirection.endToStart) {
             taskProvider.deleteTask(task.id);
           }
-          if (direction == DismissDirection.endToStart) {
+          if (direction == DismissDirection.startToEnd) {
             print('i am still here');
             taskProvider.toggleDone(task.id);
           }
@@ -59,10 +67,7 @@ class TaskCard extends StatelessWidget {
           color: AppColors.backElevated,
           child: InkWell(
             onTap: () {
-              Navigator.of(context).pushNamed(
-                AddTaskScreen.routeName,
-                arguments: task.id,
-              );
+              taskProvider.toggleDone(task.id);
             },
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -82,7 +87,7 @@ class TaskCard extends StatelessWidget {
                       taskProvider.toggleDone(task.id);
                     },
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 4),
                   if (task.importance == Importance.high)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 4.0),
@@ -94,20 +99,59 @@ class TaskCard extends StatelessWidget {
                         ),
                       ),
                     ),
+                  if (task.importance == Importance.low)
+                    Icon(
+                      Icons.arrow_downward,
+                      color: AppColors.gray,
+                      size: 20,
+                    ),
                   Expanded(
-                    child: Text(
-                      task.text,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppColors.body,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          task.text,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppColors.body.copyWith(
+                            color: task.done
+                                ? AppColors.labelTertiary
+                                : AppColors.labelPrimary,
+                            decoration:
+                                task.done ? TextDecoration.lineThrough : null,
+                          ),
+                        ),
+                        if (task.doUntil != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Text(
+                              DateFormat('d.MM.y').format(task.doUntil!),
+                              style: AppColors.subhead.copyWith(
+                                color: AppColors.labelTertiary,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Icon(
-                    Icons.info_outline,
-                    color: AppColors.labelTertiary,
+                  const SizedBox(width: 8),
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).pushNamed(
+                        AddTaskScreen.routeName,
+                        arguments: task.id,
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(16),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(
+                        Icons.info_outline,
+                        color: AppColors.labelTertiary,
+                      ),
+                    ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 8),
                 ],
               ),
             ),

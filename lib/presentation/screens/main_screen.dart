@@ -3,6 +3,7 @@ import 'package:ada_lovelace/presentation/screens/add_task_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../data-domain/models/task.dart';
 import '../../data-domain/providers/database_provider.dart';
 import '../widgets/task_card.dart';
 
@@ -22,6 +23,16 @@ class _MainScreenState extends State<MainScreen> {
       backgroundColor: AppColors.backPrimary,
       body: Consumer<DatabaseProvider>(
         builder: (context, value, child) {
+          Map<String, Task> tasks = {};
+          if (_isDoneVisible) {
+            tasks = value.tasks;
+          } else {
+            for (var item in value.tasks.entries) {
+              if (!item.value.done) {
+                tasks[item.key] = item.value;
+              }
+            }
+          }
           return CustomScrollView(
             slivers: [
               SliverAppBar(
@@ -76,19 +87,24 @@ class _MainScreenState extends State<MainScreen> {
                     children: [
                       const SizedBox(width: 60),
                       Text(
-                        'Выполнено: 5',
+                        'Выполнено — ${value.countDone()}',
                         style: AppColors.body
                             .copyWith(color: AppColors.labelTertiary),
                       ),
                       const Spacer(),
                       InkWell(
                         borderRadius: BorderRadius.circular(32),
-                        // padding: EdgeInsets.zero,
-                        onTap: () {},
-                        child: const Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: const Icon(
-                            Icons.visibility,
+                        onTap: () {
+                          setState(() {
+                            _isDoneVisible = !_isDoneVisible;
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Icon(
+                            _isDoneVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
                             color: AppColors.primary,
                           ),
                         ),
@@ -123,32 +139,38 @@ class _MainScreenState extends State<MainScreen> {
                         ),
                       );
                     }
-                    if (index == value.tasks.length + 1) {
+                    if (index == tasks.length + 1) {
                       return Padding(
                         padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                        child: Material(
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(8),
-                            bottomRight: Radius.circular(8),
-                          ),
-                          elevation: 1,
-                          color: AppColors.backElevated,
-                          child: Container(
-                            height: 56,
-                            decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(8),
-                                bottomRight: Radius.circular(8),
-                              ),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.of(context)
+                                .pushNamed(AddTaskScreen.routeName);
+                          },
+                          child: Material(
+                            borderRadius: const BorderRadius.only(
+                              bottomLeft: Radius.circular(8),
+                              bottomRight: Radius.circular(8),
                             ),
-                            alignment: Alignment.centerLeft,
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 64, bottom: 12),
-                              child: Text(
-                                'Новое',
-                                style: AppColors.body.copyWith(
-                                  color: AppColors.labelTertiary,
+                            elevation: 1,
+                            color: AppColors.backElevated,
+                            child: Container(
+                              height: 56,
+                              decoration: const BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(8),
+                                  bottomRight: Radius.circular(8),
+                                ),
+                              ),
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 64, bottom: 12),
+                                child: Text(
+                                  'Новое',
+                                  style: AppColors.body.copyWith(
+                                    color: AppColors.labelTertiary,
+                                  ),
                                 ),
                               ),
                             ),
@@ -156,10 +178,9 @@ class _MainScreenState extends State<MainScreen> {
                         ),
                       );
                     }
-                    return TaskCard(
-                        task: value.tasks.values.toList()[index - 1]);
+                    return TaskCard(task: tasks.values.toList()[index - 1]);
                   },
-                  childCount: value.tasks.length + 2,
+                  childCount: tasks.length + 2,
                 ),
               ),
             ],
