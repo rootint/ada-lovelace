@@ -25,10 +25,47 @@ class MyApp extends StatelessWidget {
       child: Consumer<ThemeProvider>(
         builder: (context, provider, _) => MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'TODO:',
-          theme: provider.currentTheme == ThemeType.light
-              ? AppTheme.lightTheme() 
-              : AppTheme.darkTheme(),
+          title: 'TODO',
+          themeMode: provider.currentTheme == ThemeType.dark
+              ? ThemeMode.dark
+              : ThemeMode.light,
+          theme: ThemeData(
+            brightness: Brightness.light,
+            primaryColor: AppColorsLight.primary,
+            colorScheme: const ColorScheme(
+              brightness: Brightness.light,
+              primary: AppColorsLight.primary,
+              onPrimary: AppColorsLight.white,
+              secondary: AppColorsLight.primary,
+              onSecondary: AppColorsLight.white,
+              error: AppColorsLight.error,
+              onError: AppColorsLight.white,
+              background: AppColorsLight.backPrimary,
+              onBackground: AppColorsLight.labelPrimary,
+              surface: AppColorsLight.backSecondary,
+              onSurface: AppColorsLight.labelPrimary,
+              onPrimaryContainer: AppColorsLight.labelPrimary,
+            ),
+            fontFamily: 'Roboto',
+          ),
+          darkTheme: ThemeData(
+            brightness: Brightness.dark,
+            primaryColor: AppColorsDark.primary,
+            colorScheme: const ColorScheme(
+              brightness: Brightness.dark,
+              primary: AppColorsDark.primary,
+              onPrimary: AppColorsDark.white,
+              secondary: AppColorsDark.primary,
+              onSecondary: AppColorsDark.white,
+              error: AppColorsDark.error,
+              onError: AppColorsDark.white,
+              background: AppColorsDark.backPrimary,
+              onBackground: AppColorsDark.labelPrimary,
+              surface: AppColorsDark.backSecondary,
+              onSurface: AppColorsDark.labelPrimary,
+            ),
+            fontFamily: 'Roboto',
+          ),
           home: const MainScreen(),
           routes: <String, WidgetBuilder>{
             AddTaskScreen.routeName: (BuildContext context) =>

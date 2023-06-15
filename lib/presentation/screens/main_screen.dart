@@ -1,4 +1,5 @@
 import 'package:ada_lovelace/core/theme.dart';
+import 'package:ada_lovelace/data-domain/providers/theme_provider.dart';
 import 'package:ada_lovelace/presentation/screens/add_task_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -19,8 +20,10 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final theme = AppTheme.of(context);
     return Scaffold(
-      backgroundColor: AppColors.backPrimary,
+      backgroundColor: theme.backPrimary,
       body: Consumer<DatabaseProvider>(
         builder: (context, value, child) {
           Map<String, Task> tasks = {};
@@ -40,7 +43,7 @@ class _MainScreenState extends State<MainScreen> {
                 snap: false,
                 floating: false,
                 expandedHeight: 80.0,
-                backgroundColor: AppColors.backPrimary,
+                backgroundColor: theme.backPrimary,
                 flexibleSpace: FlexibleSpaceBar(
                   titlePadding: const EdgeInsets.only(left: 60),
                   title: Row(
@@ -48,7 +51,7 @@ class _MainScreenState extends State<MainScreen> {
                       // const SizedBox(width: 16),
                       Text(
                         'Мои дела',
-                        style: AppColors.largeTitle.copyWith(
+                        style: theme.largeTitle.copyWith(
                           fontSize: 24,
                           fontWeight: FontWeight.w600,
                         ),
@@ -59,7 +62,7 @@ class _MainScreenState extends State<MainScreen> {
                 ),
                 // Text(
                 //   'Мои дела',
-                //   style: AppColors.largeTitle.copyWith(
+                //   style: theme.largeTitle.copyWith(
                 //     fontSize: 24,
                 //     fontWeight: FontWeight.w600,
                 //   ),
@@ -71,7 +74,7 @@ class _MainScreenState extends State<MainScreen> {
                 //       const SizedBox(width: 60),
                 //       Text(
                 //         'Мои дела',
-                //         style: AppColors.largeTitle.copyWith(
+                //         style: theme.largeTitle.copyWith(
                 //           fontSize: 32,
                 //           fontWeight: FontWeight.w600,
                 //         ),
@@ -88,8 +91,8 @@ class _MainScreenState extends State<MainScreen> {
                       const SizedBox(width: 60),
                       Text(
                         'Выполнено — ${value.countDone()}',
-                        style: AppColors.body
-                            .copyWith(color: AppColors.labelTertiary),
+                        style: theme.body
+                            .copyWith(color: theme.labelTertiary),
                       ),
                       const Spacer(),
                       InkWell(
@@ -105,7 +108,7 @@ class _MainScreenState extends State<MainScreen> {
                             _isDoneVisible
                                 ? Icons.visibility
                                 : Icons.visibility_off,
-                            color: AppColors.primary,
+                            color: theme.primary,
                           ),
                         ),
                       ),
@@ -128,12 +131,12 @@ class _MainScreenState extends State<MainScreen> {
                           elevation: 1,
                           child: Container(
                             height: 8,
-                            decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.only(
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.only(
                                 topLeft: Radius.circular(8),
                                 topRight: Radius.circular(8),
                               ),
-                              color: AppColors.backElevated,
+                              color: theme.backSecondary,
                             ),
                           ),
                         ),
@@ -153,7 +156,7 @@ class _MainScreenState extends State<MainScreen> {
                               bottomRight: Radius.circular(8),
                             ),
                             elevation: 1,
-                            color: AppColors.backElevated,
+                            color: theme.backSecondary,
                             child: Container(
                               height: 56,
                               decoration: const BoxDecoration(
@@ -168,8 +171,8 @@ class _MainScreenState extends State<MainScreen> {
                                     const EdgeInsets.only(left: 64, bottom: 12),
                                 child: Text(
                                   'Новое',
-                                  style: AppColors.body.copyWith(
-                                    color: AppColors.labelTertiary,
+                                  style: theme.body.copyWith(
+                                    color: theme.labelTertiary,
                                   ),
                                 ),
                               ),
@@ -187,11 +190,35 @@ class _MainScreenState extends State<MainScreen> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).pushNamed(AddTaskScreen.routeName);
-        },
-        child: const Icon(Icons.add),
+      floatingActionButton: Row(
+        children: [
+          const SizedBox(width: 32),
+          FloatingActionButton(
+            heroTag: 'theme',
+            onPressed: () {
+              if (themeProvider.currentTheme == ThemeType.dark) {
+                themeProvider.setTheme(ThemeType.light);
+              } else {
+                themeProvider.setTheme(ThemeType.dark);
+              }
+            },
+            backgroundColor: theme.backSecondary,
+            child: Icon(
+              themeProvider.currentTheme == ThemeType.dark
+                  ? Icons.nightlight_outlined
+                  : Icons.sunny,
+              color: theme.primary,
+            ),
+          ),
+          const Spacer(),
+          FloatingActionButton(
+            heroTag: 'add',
+            onPressed: () {
+              Navigator.of(context).pushNamed(AddTaskScreen.routeName);
+            },
+            child: const Icon(Icons.add),
+          ),
+        ],
       ),
     );
   }

@@ -24,7 +24,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   final _controller = TextEditingController();
   String _dropdownValue = dropdownOptions.first;
   bool _isDateSelected = false;
-  bool _isDeleteDisabled = false;
   DateTime? _date;
   bool firstBuild = true;
 
@@ -46,6 +45,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   Widget build(BuildContext context) {
     final databaseProvider =
         Provider.of<DatabaseProvider>(context, listen: false);
+    final theme = AppTheme.of(context);
     final id = ModalRoute.of(context)!.settings.arguments as String?;
     if (firstBuild && id != null) {
       Task task = databaseProvider.tasks[id]!;
@@ -58,18 +58,18 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       firstBuild = false;
     }
     return Scaffold(
-      backgroundColor: AppColors.backPrimary,
+      backgroundColor: theme.backPrimary,
       appBar: AppBar(
-        backgroundColor: AppColors.backPrimary,
+        backgroundColor: theme.backPrimary,
         elevation: 0,
         scrolledUnderElevation: 4,
         leading: IconButton(
           onPressed: () {
             Navigator.of(context).pop();
           },
-          icon: const Icon(
+          icon: Icon(
             Icons.close,
-            color: AppColors.labelPrimary,
+            color: theme.labelPrimary,
           ),
         ),
         actions: [
@@ -84,10 +84,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     },
               child: Text(
                 'СОХРАНИТЬ',
-                style: AppColors.button.copyWith(
+                style: theme.button.copyWith(
                   color: _controller.text.isEmpty
-                      ? AppColors.labelDisabled
-                      : AppColors.primary,
+                      ? theme.labelDisabled
+                      : theme.primary,
                 ),
               ),
             ),
@@ -106,17 +106,19 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    color: AppColors.backSecondary,
+                    color: theme.backSecondary,
                   ),
                   padding: const EdgeInsets.all(16),
                   child: TextField(
                     controller: _controller,
                     decoration: InputDecoration.collapsed(
                       hintText: 'Что надо сделать...',
-                      hintStyle: AppColors.body.copyWith(
-                        color: AppColors.labelTertiary,
+                      hintStyle: theme.body.copyWith(
+                        color: theme.labelTertiary,
                       ),
                     ),
+                    style:
+                        theme.body.copyWith(color: theme.labelPrimary),
                     onChanged: (_) => setState(() {}),
                     minLines: 4,
                     maxLines: null,
@@ -126,10 +128,11 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               const SizedBox(height: 24),
               Text(
                 'Важность',
-                style: AppColors.body,
+                style: theme.body,
               ),
               DropdownButton<String>(
                 icon: null,
+                dropdownColor: theme.backElevated,
                 items: dropdownOptions.map<DropdownMenuItem<String>>(
                   (String value) {
                     return DropdownMenuItem<String>(
@@ -137,16 +140,16 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                       child: value == "Нет"
                           ? Text(
                               value,
-                              style: AppColors.subhead.copyWith(
-                                color: AppColors.labelTertiary,
+                              style: theme.subhead.copyWith(
+                                color: theme.labelTertiary,
                               ),
                             )
                           : value == 'Низкий'
-                              ? Text(value, style: AppColors.subhead)
+                              ? Text(value, style: theme.subhead)
                               : Text(
                                   value,
-                                  style: AppColors.subhead
-                                      .copyWith(color: AppColors.error),
+                                  style: theme.subhead
+                                      .copyWith(color: theme.error),
                                 ),
                     );
                   },
@@ -174,13 +177,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     children: [
                       Text(
                         'Сделать до',
-                        style: AppColors.body,
+                        style: theme.body,
                       ),
                       if (_isDateSelected && _date != null)
                         Text(
                           DateFormat('d.MM.y').format(_date!),
-                          style: AppColors.subhead
-                              .copyWith(color: AppColors.primary),
+                          style: theme.subhead
+                              .copyWith(color: theme.primary),
                         ),
                     ],
                   ),
@@ -195,11 +198,18 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                             firstDate: DateTime.now(),
                             // lastDate: DateTime(DateTime.now().year + 100),
                             lastDate: DateTime(2300),
-                          ).then((value) => setState(() => _date = value));
+                          ).then(
+                            (value) => setState(() {
+                              _date = value;
+                              if (value != null) {
+                                _isDateSelected = true;
+                              }
+                            }),
+                          );
                         } else {
                           _date = null;
+                          _isDateSelected = value;
                         }
-                        _isDateSelected = value;
                       });
                     },
                   ),
@@ -209,11 +219,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               const Separator(),
               const SizedBox(height: 20),
               InkWell(
-                onTap: id == null ? null : () {
-                  databaseProvider.deleteTask(id);
-                  Navigator.of(context).pop();
-                },
-                highlightColor: AppColors.error.withOpacity(0.1),
+                onTap: id == null
+                    ? null
+                    : () {
+                        databaseProvider.deleteTask(id);
+                        Navigator.of(context).pop();
+                      },
+                highlightColor: theme.error.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -223,16 +235,16 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                       Icon(
                         Icons.delete,
                         color: id == null
-                            ? AppColors.labelDisabled
-                            : AppColors.error,
+                            ? theme.labelDisabled
+                            : theme.error,
                       ),
                       const SizedBox(width: 12),
                       Text(
                         'Удалить',
-                        style: AppColors.body.copyWith(
+                        style: theme.body.copyWith(
                           color: id == null
-                              ? AppColors.labelDisabled
-                              : AppColors.error,
+                              ? theme.labelDisabled
+                              : theme.error,
                         ),
                       ),
                     ],
@@ -253,7 +265,7 @@ class Separator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.separator,
+      color: AppTheme.of(context).separator,
       width: double.infinity,
       height: 0.5,
     );

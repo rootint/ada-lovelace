@@ -17,6 +17,7 @@ class TaskCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final taskProvider = Provider.of<DatabaseProvider>(context, listen: false);
+    final theme = AppTheme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Dismissible(
@@ -38,33 +39,33 @@ class TaskCard extends StatelessWidget {
           }
         },
         background: Container(
-          color: AppColors.success,
-          child: const Row(
+          color: theme.success,
+          child: Row(
             children: [
-              SizedBox(width: 24),
+              const SizedBox(width: 24),
               Icon(
                 Icons.check,
-                color: AppColors.white,
+                color: theme.white,
               ),
             ],
           ),
         ),
         secondaryBackground: Container(
-          color: AppColors.error,
-          child: const Row(
+          color: theme.error,
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Icon(
                 Icons.delete,
-                color: AppColors.white,
+                color: theme.white,
               ),
-              SizedBox(width: 24),
+              const SizedBox(width: 24),
             ],
           ),
         ),
         child: Material(
           elevation: 1,
-          color: AppColors.backElevated,
+          color: theme.backSecondary,
           child: InkWell(
             onTap: () {
               taskProvider.toggleDone(task.id);
@@ -77,10 +78,10 @@ class TaskCard extends StatelessWidget {
                   Checkbox(
                     fillColor: MaterialStateProperty.all(
                       task.done
-                          ? AppColors.success
+                          ? theme.success
                           : task.importance == Importance.high
-                              ? AppColors.error
-                              : AppColors.separator,
+                              ? theme.error
+                              : theme.separator,
                     ),
                     value: task.done,
                     onChanged: (_) {
@@ -93,8 +94,8 @@ class TaskCard extends StatelessWidget {
                       padding: const EdgeInsets.only(bottom: 4.0),
                       child: Text(
                         '!! ',
-                        style: AppColors.title.copyWith(
-                          color: AppColors.error,
+                        style: theme.title.copyWith(
+                          color: theme.error,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -102,7 +103,7 @@ class TaskCard extends StatelessWidget {
                   if (task.importance == Importance.low)
                     Icon(
                       Icons.arrow_downward,
-                      color: AppColors.gray,
+                      color: theme.gray,
                       size: 20,
                     ),
                   Expanded(
@@ -113,10 +114,10 @@ class TaskCard extends StatelessWidget {
                           task.text,
                           maxLines: 3,
                           overflow: TextOverflow.ellipsis,
-                          style: AppColors.body.copyWith(
+                          style: theme.body.copyWith(
                             color: task.done
-                                ? AppColors.labelTertiary
-                                : AppColors.labelPrimary,
+                                ? theme.labelTertiary
+                                : theme.labelPrimary,
                             decoration:
                                 task.done ? TextDecoration.lineThrough : null,
                           ),
@@ -126,8 +127,8 @@ class TaskCard extends StatelessWidget {
                             padding: const EdgeInsets.only(top: 4),
                             child: Text(
                               DateFormat('d.MM.y').format(task.doUntil!),
-                              style: AppColors.subhead.copyWith(
-                                color: AppColors.labelTertiary,
+                              style: theme.subhead.copyWith(
+                                color: theme.labelTertiary,
                               ),
                             ),
                           ),
@@ -147,7 +148,7 @@ class TaskCard extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       child: Icon(
                         Icons.info_outline,
-                        color: AppColors.labelTertiary,
+                        color: theme.labelTertiary,
                       ),
                     ),
                   ),
