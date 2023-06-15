@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
-import 'package:sqflite/sqflite.dart';
 
 import '../models/task.dart';
 
