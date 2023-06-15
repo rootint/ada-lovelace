@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/logger.dart';
 import '../../core/theme.dart';
 import '../../data-domain/models/task.dart';
 import '../../data-domain/providers/database_provider.dart';
@@ -24,6 +25,7 @@ class TaskCard extends StatelessWidget {
         key: Key(task.id),
         confirmDismiss: (direction) async {
           if (direction == DismissDirection.startToEnd) {
+            Logger.addToLog('task with ${task.id} is completed');
             taskProvider.toggleDone(task.id);
             return false;
           }
@@ -31,11 +33,8 @@ class TaskCard extends StatelessWidget {
         },
         onDismissed: (direction) {
           if (direction == DismissDirection.endToStart) {
+            Logger.addToLog('task with ${task.id} is deleted');
             taskProvider.deleteTask(task.id);
-          }
-          if (direction == DismissDirection.startToEnd) {
-            print('i am still here');
-            taskProvider.toggleDone(task.id);
           }
         },
         background: Container(
@@ -68,6 +67,7 @@ class TaskCard extends StatelessWidget {
           color: theme.backSecondary,
           child: InkWell(
             onTap: () {
+              Logger.addToLog('task with ${task.id} is completed');
               taskProvider.toggleDone(task.id);
             },
             child: Container(
@@ -85,6 +85,7 @@ class TaskCard extends StatelessWidget {
                     ),
                     value: task.done,
                     onChanged: (_) {
+                      Logger.addToLog('completion of ${task.id} is toggled');
                       taskProvider.toggleDone(task.id);
                     },
                   ),
@@ -138,6 +139,7 @@ class TaskCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   InkWell(
                     onTap: () {
+                      Logger.addToLog('opened AddTaskScreen, arguments: ${task.id}');
                       Navigator.of(context).pushNamed(
                         AddTaskScreen.routeName,
                         arguments: task.id,

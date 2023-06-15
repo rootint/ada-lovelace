@@ -32,7 +32,6 @@ class DatabaseProvider extends ChangeNotifier {
     );
     // var db = await openDatabase('tasks.db');
     tasks[id] = task;
-    print(task);
     notifyListeners();
   }
 
@@ -50,7 +49,6 @@ class DatabaseProvider extends ChangeNotifier {
       done: false,
     );
     tasks[id] = task;
-    print(task);
     notifyListeners();
   }
 

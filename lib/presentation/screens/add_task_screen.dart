@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/logger.dart';
+
 const List<String> dropdownOptions = ['Нет', 'Низкий', '!! Высокий'];
 
 class AddTaskScreen extends StatefulWidget {
@@ -36,8 +38,11 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     final taskProvider = Provider.of<DatabaseProvider>(context, listen: false);
     if (id == null) {
       taskProvider.saveTask(_controller.text, _dropdownValue, _date);
+      Logger.addToLog(
+          'saving task with ${_controller.text}, $_dropdownValue, $_date');
     } else {
       taskProvider.saveTaskById(id, _controller.text, _dropdownValue, _date);
+      Logger.addToLog('saving task with id $id');
     }
   }
 
@@ -49,6 +54,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     final id = ModalRoute.of(context)!.settings.arguments as String?;
     if (firstBuild && id != null) {
       Task task = databaseProvider.tasks[id]!;
+      Logger.addToLog('initial build of AddTaskScreen');
       setState(() {
         _controller.text = task.text;
         _date = task.doUntil;
@@ -65,6 +71,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         scrolledUnderElevation: 4,
         leading: IconButton(
           onPressed: () {
+            Logger.addToLog('exited AddTaskScreen');
             Navigator.of(context).pop();
           },
           icon: Icon(
@@ -80,6 +87,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   ? null
                   : () {
                       saveTask(id);
+                      Logger.addToLog('exited AddTaskScreen');
                       Navigator.of(context).pop();
                     },
               child: Text(
@@ -117,8 +125,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                         color: theme.labelTertiary,
                       ),
                     ),
-                    style:
-                        theme.body.copyWith(color: theme.labelPrimary),
+                    style: theme.body.copyWith(color: theme.labelPrimary),
                     onChanged: (_) => setState(() {}),
                     minLines: 4,
                     maxLines: null,
@@ -160,6 +167,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 onChanged: (String? value) {
                   // This is called when the user selects an item.
                   setState(() {
+                    Logger.addToLog('selected _dropdownValue: $value');
                     _dropdownValue = value!;
                   });
                 },
@@ -182,8 +190,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                       if (_isDateSelected && _date != null)
                         Text(
                           DateFormat('d.MM.y').format(_date!),
-                          style: theme.subhead
-                              .copyWith(color: theme.primary),
+                          style: theme.subhead.copyWith(color: theme.primary),
                         ),
                     ],
                   ),
@@ -200,6 +207,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                             lastDate: DateTime(2300),
                           ).then(
                             (value) => setState(() {
+                              Logger.addToLog('picked date: $value');
                               _date = value;
                               if (value != null) {
                                 _isDateSelected = true;
@@ -222,7 +230,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 onTap: id == null
                     ? null
                     : () {
+                        Logger.addToLog('task with $id is deleted');
                         databaseProvider.deleteTask(id);
+                        Logger.addToLog('exited AddTaskScreen');
                         Navigator.of(context).pop();
                       },
                 highlightColor: theme.error.withOpacity(0.1),
@@ -234,17 +244,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     children: [
                       Icon(
                         Icons.delete,
-                        color: id == null
-                            ? theme.labelDisabled
-                            : theme.error,
+                        color: id == null ? theme.labelDisabled : theme.error,
                       ),
                       const SizedBox(width: 12),
                       Text(
                         'Удалить',
                         style: theme.body.copyWith(
-                          color: id == null
-                              ? theme.labelDisabled
-                              : theme.error,
+                          color: id == null ? theme.labelDisabled : theme.error,
                         ),
                       ),
                     ],

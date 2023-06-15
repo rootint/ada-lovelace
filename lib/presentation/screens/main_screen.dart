@@ -1,3 +1,4 @@
+import 'package:ada_lovelace/core/logger.dart';
 import 'package:ada_lovelace/core/theme.dart';
 import 'package:ada_lovelace/data-domain/providers/theme_provider.dart';
 import 'package:ada_lovelace/presentation/screens/add_task_screen.dart';
@@ -99,6 +100,7 @@ class _MainScreenState extends State<MainScreen> {
                         borderRadius: BorderRadius.circular(32),
                         onTap: () {
                           setState(() {
+                            Logger.addToLog('toggled done visibility');
                             _isDoneVisible = !_isDoneVisible;
                           });
                         },
@@ -147,6 +149,7 @@ class _MainScreenState extends State<MainScreen> {
                         padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
                         child: GestureDetector(
                           onTap: () {
+                            Logger.addToLog('opened AddTaskScreen');
                             Navigator.of(context)
                                 .pushNamed(AddTaskScreen.routeName);
                           },
@@ -197,8 +200,10 @@ class _MainScreenState extends State<MainScreen> {
             heroTag: 'theme',
             onPressed: () {
               if (themeProvider.currentTheme == ThemeType.dark) {
+                Logger.addToLog('changed theme to light theme');
                 themeProvider.setTheme(ThemeType.light);
               } else {
+                Logger.addToLog('changed theme to dark theme');
                 themeProvider.setTheme(ThemeType.dark);
               }
             },
@@ -214,6 +219,7 @@ class _MainScreenState extends State<MainScreen> {
           FloatingActionButton(
             heroTag: 'add',
             onPressed: () {
+              Logger.addToLog('opened AddTaskScreen');
               Navigator.of(context).pushNamed(AddTaskScreen.routeName);
             },
             child: const Icon(Icons.add),
