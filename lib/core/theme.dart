@@ -16,7 +16,12 @@ class AppTheme {
         onBackground: AppColorsLight.labelPrimary,
         surface: AppColorsLight.backSecondary,
         onSurface: AppColorsLight.labelPrimary,
+        onPrimaryContainer: AppColorsLight.labelPrimary,
       ),
+      // datePickerTheme: DatePickerThemeData(
+
+      // ),
+
       fontFamily: 'Roboto',
     );
   }
@@ -32,8 +37,8 @@ class AppTheme {
         onSecondary: AppColorsDark.white,
         error: AppColorsDark.error,
         onError: AppColorsDark.white,
-        // background: AppColorsDark.backPrimary,
-        background: AppColorsLight.backPrimary,
+        background: AppColorsDark.backPrimary,
+        // background: AppColorsLight.backPrimary,
         onBackground: AppColorsDark.labelPrimary,
         surface: AppColorsDark.backSecondary,
         onSurface: AppColorsDark.labelPrimary,
@@ -59,6 +64,23 @@ class AppColors {
   static const Color backPrimary = Color(0xFFF7F6F2);
   static const Color backSecondary = Color(0xFFFFFFFF);
   static const Color backElevated = Color(0xFFFFFFFF);
+
+  // static const Color primary = Color(0xFF0A84FF);
+  // static const Color success = Color(0xFF32D74B);
+  // static const Color error = Color(0xFFFF453A);
+  // static const Color separator = Color(0x33FFFFFF);
+  // static const Color overlay = Color(0x52000000);
+  // static const Color labelPrimary = Color(0xFFFFFFFF);
+  // static const Color labelSecondary = Color(0x99FFFFFF);
+  // static const Color labelTertiary = Color(0x66FFFFFF);
+  // static const Color labelDisabled = Color(0x26FFFFFF);
+  // static const Color gray = Color(0xFF8E8E93);
+  // static const Color lightGray = Color(0xFF48484A);
+  // static const Color white = Color(0xFFFFFFFF);
+  // static const Color backPrimary = Color(0xFF161618);
+  // static const Color backSecondary = Color(0xFF252528);
+  // static const Color backElevated = Color(0xFF3C3C3F);
+
 
   static TextStyle get largeTitle => const TextStyle(
         fontFamily: 'Roboto',
@@ -94,7 +116,7 @@ class AppColors {
 
   static TextStyle get subhead => const TextStyle(
         fontFamily: 'Roboto',
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w400,
         fontSize: 14,
         color: labelPrimary,
         height: 1.428,
