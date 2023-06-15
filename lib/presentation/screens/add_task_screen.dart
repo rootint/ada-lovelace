@@ -1,4 +1,5 @@
 import 'package:ada_lovelace/core/theme.dart';
+import 'package:ada_lovelace/data-domain/models/task.dart';
 import 'package:ada_lovelace/data-domain/providers/database_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -15,11 +16,17 @@ class AddTaskScreen extends StatefulWidget {
 }
 
 class _AddTaskScreenState extends State<AddTaskScreen> {
+  Map<Importance, String> reverseConversionMap = {
+    Importance.none: 'Нет',
+    Importance.low: 'Низкий',
+    Importance.high: '!! Высокий',
+  };
   final _controller = TextEditingController();
   String _dropdownValue = dropdownOptions.first;
   bool _isDateSelected = false;
   bool _isDeleteDisabled = false;
   DateTime? _date;
+  bool firstBuild = true;
 
   @override
   void initState() {
@@ -27,15 +34,30 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     super.initState();
   }
 
-  void saveTask() {
+  void saveTask(String? id) {
     final taskProvider = Provider.of<DatabaseProvider>(context, listen: false);
-    taskProvider.saveTask(_controller.text, _dropdownValue, _date);
+    if (id == null) {
+      taskProvider.saveTask(_controller.text, _dropdownValue, _date);
+    } else {
+      taskProvider.saveTaskById(id, _controller.text, _dropdownValue, _date);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as String?;
-    // final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final databaseProvider =
+        Provider.of<DatabaseProvider>(context, listen: false);
+    final id = ModalRoute.of(context)!.settings.arguments as String?;
+    if (firstBuild && id != null) {
+      Task task = databaseProvider.tasks[id]!;
+      setState(() {
+        _controller.text = task.text;
+        _date = task.doUntil;
+        _isDateSelected = true;
+        _dropdownValue = reverseConversionMap[task.importance]!;
+      });
+      firstBuild = false;
+    }
     return Scaffold(
       backgroundColor: AppColors.backPrimary,
       appBar: AppBar(
@@ -56,7 +78,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             padding: const EdgeInsets.only(right: 8.0),
             child: TextButton(
               onPressed: () {
-                saveTask();
+                saveTask(id);
                 Navigator.of(context).pop();
               },
               child: Text(
@@ -169,7 +191,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                             firstDate: DateTime.now(),
                             // lastDate: DateTime(DateTime.now().year + 100),
                             lastDate: DateTime(2300),
-
                           ).then((value) => setState(() => _date = value));
                         }
                         _isDateSelected = value;

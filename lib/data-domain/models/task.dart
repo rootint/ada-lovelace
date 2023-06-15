@@ -1,11 +1,9 @@
-import 'package:uuid/uuid.dart';
-
 class Task {
-  final String id;
-  final String text;
-  final Importance importance;
-  final DateTime? doUntil;
-  final bool done;
+  String id;
+  String text;
+  Importance importance;
+  DateTime? doUntil;
+  bool done;
 
   Task({
     required this.id,
