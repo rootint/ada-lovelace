@@ -4,7 +4,6 @@ import 'package:ada_lovelace/core/logger.dart';
 import 'package:ada_lovelace/core/theme.dart';
 import 'package:ada_lovelace/data-domain/providers/theme_provider.dart';
 import 'package:ada_lovelace/presentation/screens/add_task_screen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -101,7 +100,8 @@ class _MainScreenState extends State<MainScreen> {
                   expandedTitleScale: 1.6,
                   titlePadding: EdgeInsets.only(
                       left: _scrollController.hasClients
-                          ? max(min(60 - _scrollController.offset * 0.66, 60), 16)
+                          ? max(
+                              min(60 - _scrollController.offset * 0.66, 60), 16)
                           : 60),
                   title: Padding(
                     padding: EdgeInsets.only(
@@ -246,9 +246,11 @@ class _MainScreenState extends State<MainScreen> {
             },
             backgroundColor: theme.backSecondary,
             child: Icon(
-              themeProvider.currentTheme == ThemeType.dark
-                  ? Icons.nightlight_outlined
-                  : Icons.sunny,
+              themeProvider.currentTheme == null
+                  ? Icons.auto_mode
+                  : themeProvider.currentTheme == ThemeType.dark
+                      ? Icons.nightlight_outlined
+                      : Icons.sunny,
               color: theme.primary,
             ),
           ),

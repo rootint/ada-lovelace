@@ -255,3 +255,42 @@ class AppColorsDark {
   static const Color backSecondary = Color(0xFF252528);
   static const Color backElevated = Color(0xFF3C3C3F);
 }
+
+final appThemeLight = ThemeData(
+  brightness: Brightness.light,
+  primaryColor: AppColorsLight.primary,
+  colorScheme: const ColorScheme(
+    brightness: Brightness.light,
+    primary: AppColorsLight.primary,
+    onPrimary: AppColorsLight.white,
+    secondary: AppColorsLight.primary,
+    onSecondary: AppColorsLight.white,
+    error: AppColorsLight.error,
+    onError: AppColorsLight.white,
+    background: AppColorsLight.backPrimary,
+    onBackground: AppColorsLight.labelPrimary,
+    surface: AppColorsLight.backSecondary,
+    onSurface: AppColorsLight.labelPrimary,
+    onPrimaryContainer: AppColorsLight.labelPrimary,
+  ),
+  fontFamily: 'Roboto',
+);
+
+final appThemeDark = ThemeData(
+  brightness: Brightness.dark,
+  primaryColor: AppColorsDark.primary,
+  colorScheme: const ColorScheme(
+    brightness: Brightness.dark,
+    primary: AppColorsDark.primary,
+    onPrimary: AppColorsDark.white,
+    secondary: AppColorsDark.primary,
+    onSecondary: AppColorsDark.white,
+    error: AppColorsDark.error,
+    onError: AppColorsDark.white,
+    background: AppColorsDark.backPrimary,
+    onBackground: AppColorsDark.labelPrimary,
+    surface: AppColorsDark.backSecondary,
+    onSurface: AppColorsDark.labelPrimary,
+  ),
+  fontFamily: 'Roboto',
+);
