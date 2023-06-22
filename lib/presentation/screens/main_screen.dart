@@ -59,174 +59,94 @@ class _MainScreenState extends State<MainScreen> {
               }
             }
           }
-          return CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              SliverAppBar(
-                pinned: true,
-                snap: false,
-                floating: false,
-                expandedHeight: 80.0,
-                backgroundColor: theme.backPrimary,
-                actions: [
-                  if (_scrollController.hasClients &&
-                      _scrollController.offset > 50)
-                    Opacity(
-                      opacity: min(1, (_scrollController.offset - 50) / 30),
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(32),
-                          onTap: () {
-                            setState(() {
-                              Logger.addToLog('toggled done visibility');
-                              _isDoneVisible = !_isDoneVisible;
-                            });
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Icon(
-                              _isDoneVisible
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                              color: theme.primary,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-                flexibleSpace: FlexibleSpaceBar(
-                  expandedTitleScale: 1.6,
-                  titlePadding: EdgeInsets.only(
-                      left: _scrollController.hasClients
-                          ? max(
-                              min(60 - _scrollController.offset * 0.66, 60), 16)
-                          : 60),
-                  title: Padding(
-                    padding: EdgeInsets.only(
-                        bottom: _scrollController.hasClients
-                            ? max(min(_scrollController.offset, 16), 0)
-                            : 0),
-                    child: Row(
-                      children: [
-                        Text(
-                          'Мои дела',
-                          style: theme.largeTitle.copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
+          return SafeArea(
+            child: CustomScrollView(
+              slivers: [
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: TitleBar(
+                    value: value.countDone(),
+                    isDoneVisible: _isDoneVisible,
+                    onPressed: () {
+                      setState(() {
+                        Logger.addToLog('toggled done visibility');
+                        _isDoneVisible = !_isDoneVisible;
+                      });
+                    },
                   ),
                 ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 60),
-                      Text(
-                        'Выполнено — ${value.countDone()}',
-                        style: theme.body.copyWith(color: theme.labelTertiary),
-                      ),
-                      const Spacer(),
-                      InkWell(
-                        borderRadius: BorderRadius.circular(32),
-                        onTap: () {
-                          setState(() {
-                            Logger.addToLog('toggled done visibility');
-                            _isDoneVisible = !_isDoneVisible;
-                          });
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Icon(
-                            _isDoneVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                            color: theme.primary,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                    ],
-                  ),
-                ),
-              ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    if (index == 0) {
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                        child: Material(
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(8),
-                            topRight: Radius.circular(8),
-                          ),
-                          elevation: 1,
-                          child: Container(
-                            height: 8,
-                            decoration: BoxDecoration(
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(8),
-                                topRight: Radius.circular(8),
-                              ),
-                              color: theme.backSecondary,
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-                    if (index == tasks.length + 1) {
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                        child: GestureDetector(
-                          onTap: () {
-                            Logger.addToLog('opened AddTaskScreen');
-                            Navigator.of(context)
-                                .pushNamed(AddTaskScreen.routeName);
-                          },
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      if (index == 0) {
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
                           child: Material(
                             borderRadius: const BorderRadius.only(
-                              bottomLeft: Radius.circular(8),
-                              bottomRight: Radius.circular(8),
+                              topLeft: Radius.circular(8),
+                              topRight: Radius.circular(8),
                             ),
                             elevation: 1,
-                            color: theme.backSecondary,
                             child: Container(
-                              height: 56,
-                              decoration: const BoxDecoration(
-                                borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(8),
-                                  bottomRight: Radius.circular(8),
+                              height: 8,
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(8),
+                                  topRight: Radius.circular(8),
                                 ),
+                                color: theme.backSecondary,
                               ),
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 64, bottom: 12),
-                                child: Text(
-                                  'Новое',
-                                  style: theme.body.copyWith(
-                                    color: theme.labelTertiary,
+                            ),
+                          ),
+                        );
+                      }
+                      if (index == tasks.length + 1) {
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                          child: GestureDetector(
+                            onTap: () {
+                              Logger.addToLog('opened AddTaskScreen');
+                              Navigator.of(context)
+                                  .pushNamed(AddTaskScreen.routeName);
+                            },
+                            child: Material(
+                              borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(8),
+                                bottomRight: Radius.circular(8),
+                              ),
+                              elevation: 1,
+                              color: theme.backSecondary,
+                              child: Container(
+                                height: 56,
+                                decoration: const BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(8),
+                                    bottomRight: Radius.circular(8),
+                                  ),
+                                ),
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 64, bottom: 12),
+                                  child: Text(
+                                    'Новое',
+                                    style: theme.body.copyWith(
+                                      color: theme.labelTertiary,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    }
-                    return TaskCard(task: tasks.values.toList()[index - 1]);
-                  },
-                  childCount: tasks.length + 2,
+                        );
+                      }
+                      return TaskCard(task: tasks.values.toList()[index - 1]);
+                    },
+                    childCount: tasks.length + 2,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       ),
@@ -266,5 +186,78 @@ class _MainScreenState extends State<MainScreen> {
         ],
       ),
     );
+  }
+}
+
+class TitleBar extends SliverPersistentHeaderDelegate {
+  TitleBar({
+    required this.value,
+    required this.onPressed,
+    required this.isDoneVisible,
+  });
+  final int value;
+  final Function onPressed;
+  final bool isDoneVisible;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final theme = AppTheme.of(context);
+    return Material(
+      elevation: min(4, shrinkOffset / 20),
+      color: theme.backPrimary,
+      child: Stack(
+        children: [
+          Positioned(
+            left: 60 - min(44, shrinkOffset),
+            bottom: 16 + max(0, 24 - shrinkOffset / 2),
+            child: Text(
+              'Мои дела',
+              style: theme.largeTitle.copyWith(
+                fontSize: max(20, 32 - shrinkOffset),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Positioned(
+            left: 60,
+            bottom: 16,
+            child: Opacity(
+              opacity: 1 - min(1, shrinkOffset / 20),
+              child: Text(
+                'Выполнено — $value',
+                style: theme.body.copyWith(color: theme.labelTertiary),
+              ),
+            ),
+          ),
+          Positioned(
+            right: 8,
+            bottom: 8,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(32),
+              onTap: () => onPressed(),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(
+                  isDoneVisible ? Icons.visibility : Icons.visibility_off,
+                  color: theme.primary,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  double get maxExtent => 110;
+
+  @override
+  double get minExtent => 56;
+
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
+    return true;
   }
 }

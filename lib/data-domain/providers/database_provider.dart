@@ -5,15 +5,15 @@ import '../models/task.dart';
 
 class DatabaseProvider extends ChangeNotifier {
   DatabaseProvider() {
-    for (int i = 0; i < 10; ++i) {
-      _tasks[i.toString()] = Task(
-        id: i.toString(),
-        text: i.toString(),
-        importance: Importance.none,
-        doUntil: null,
-        done: false,
-      );
-    }
+    // for (int i = 0; i < 10; ++i) {
+    //   _tasks[i.toString()] = Task(
+    //     id: i.toString(),
+    //     text: i.toString(),
+    //     importance: Importance.none,
+    //     doUntil: null,
+    //     done: false,
+    //   );
+    // }
   }
 
   Map<String, Importance> conversionMap = {
