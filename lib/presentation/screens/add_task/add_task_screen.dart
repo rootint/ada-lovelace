@@ -1,6 +1,6 @@
 import 'package:ada_lovelace/core/theme.dart';
-import 'package:ada_lovelace/data-domain/models/task.dart';
-import 'package:ada_lovelace/data-domain/providers/database_provider.dart';
+import 'package:ada_lovelace/domain/models/task.dart';
+import 'package:ada_lovelace/core/providers/database_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -40,6 +40,23 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       taskProvider.saveTaskById(id, _controller.text, importance, _date);
       Logger.addToLog('saving task with id $id');
     }
+  }
+
+  // TODO: fix theming in the DatePicker
+  void setDate() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2300),
+    );
+    setState(() {
+      Logger.addToLog('picked date: $date');
+      _date = date;
+      if (date != null) {
+        _isDateSelected = true;
+      }
+    });
   }
 
   @override
@@ -93,7 +110,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   ? null
                   : () {
                       saveTask(id, importanceMap);
-                      Logger.addToLog('exited AddTaskScreen, saved task with id: $id');
+                      Logger.addToLog(
+                          'exited AddTaskScreen, saved task with id: $id');
                       Navigator.of(context).pop();
                     },
               child: Text(
@@ -195,36 +213,26 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                         style: theme.body,
                       ),
                       if (_isDateSelected && _date != null)
-                        Text(
-                          DateFormat('d.MM.y').format(_date!),
-                          style: theme.subhead.copyWith(color: theme.primary),
+                        InkWell(
+                          onTap: setDate,
+                          child: Text(
+                            DateFormat('d.MM.y').format(_date!),
+                            style: theme.subhead.copyWith(color: theme.primary),
+                          ),
                         ),
                     ],
                   ),
                   Switch(
                     value: _isDateSelected,
                     onChanged: (value) {
-                      setState(() {
-                        if (value) {
-                          showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime.now(),
-                            lastDate: DateTime(2300),
-                          ).then(
-                            (value) => setState(() {
-                              Logger.addToLog('picked date: $value');
-                              _date = value;
-                              if (value != null) {
-                                _isDateSelected = true;
-                              }
-                            }),
-                          );
-                        } else {
+                      if (value) {
+                        setDate();
+                      } else {
+                        setState(() {
                           _date = null;
                           _isDateSelected = value;
-                        }
-                      });
+                        });
+                      }
                     },
                   ),
                 ],

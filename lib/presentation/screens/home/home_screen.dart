@@ -1,14 +1,14 @@
 import 'package:ada_lovelace/core/logger.dart';
 import 'package:ada_lovelace/core/theme.dart';
-import 'package:ada_lovelace/data-domain/providers/theme_provider.dart';
+import 'package:ada_lovelace/core/providers/theme_provider.dart';
 import 'package:ada_lovelace/presentation/screens/add_task/add_task_screen.dart';
 import 'package:ada_lovelace/presentation/screens/home/widgets/title_bar.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../data-domain/models/task.dart';
-import '../../../data-domain/providers/database_provider.dart';
+import '../../../domain/models/task.dart';
+import '../../../core/providers/database_provider.dart';
 import '../../widgets/task_card.dart';
 
 class MainScreen extends StatefulWidget {

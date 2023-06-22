@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
-import '../models/task.dart';
+import '../../domain/models/task.dart';
 
 class DatabaseProvider extends ChangeNotifier {
   DatabaseProvider() {

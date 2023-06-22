@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 
 import '../../core/logger.dart';
 import '../../core/theme.dart';
-import '../../data-domain/models/task.dart';
-import '../../data-domain/providers/database_provider.dart';
+import '../../domain/models/task.dart';
+import '../../core/providers/database_provider.dart';
 import '../screens/add_task/add_task_screen.dart';
 
 class TaskCard extends StatelessWidget {
@@ -93,6 +93,7 @@ class TaskCard extends StatelessWidget {
                   if (task.importance == Importance.high)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 4.0),
+                      // TODO: change this to an icon and fix the bottom padding
                       child: Text(
                         '!! ',
                         style: theme.title.copyWith(
