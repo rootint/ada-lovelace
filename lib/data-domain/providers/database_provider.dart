@@ -5,39 +5,31 @@ import '../models/task.dart';
 
 class DatabaseProvider extends ChangeNotifier {
   DatabaseProvider() {
-    // for (int i = 0; i < 10; ++i) {
-    //   _tasks[i.toString()] = Task(
-    //     id: i.toString(),
-    //     text: i.toString(),
-    //     importance: Importance.none,
-    //     doUntil: null,
-    //     done: false,
-    //   );
-    // }
+    for (int i = 0; i < 12; ++i) {
+      _tasks[i.toString()] = Task(
+        id: i.toString(),
+        text: i.toString(),
+        importance: Importance.none,
+        doUntil: null,
+        done: false,
+      );
+    }
   }
 
-  Map<String, Importance> conversionMap = {
-    'Нет': Importance.none,
-    'Низкий': Importance.low,
-    '!! Высокий': Importance.high,
-  };
-
-  // final List<Task> _tasks = [];
   final Map<String, Task> _tasks = {};
 
-  // List<Task> get tasks => _tasks;
   Map<String, Task> get tasks => _tasks;
 
   void saveTask(
     String text,
-    String importance,
+    Importance importance,
     DateTime? date,
   ) async {
     String id = const Uuid().v4();
     Task task = Task(
       id: id,
       text: text,
-      importance: conversionMap[importance]!,
+      importance: importance,
       doUntil: date,
       done: false,
     );
@@ -49,13 +41,13 @@ class DatabaseProvider extends ChangeNotifier {
   void saveTaskById(
     String id,
     String text,
-    String importance,
+    Importance importance,
     DateTime? date,
   ) async {
     Task task = Task(
       id: id,
       text: text,
-      importance: conversionMap[importance]!,
+      importance: importance,
       doUntil: date,
       done: false,
     );

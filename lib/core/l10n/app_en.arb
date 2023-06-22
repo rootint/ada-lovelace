@@ -1,0 +1,13 @@
+{
+  "appTitle": "My List",
+  "tasksCompleted": "Completed — {tasksCompleted}",
+  "addNewText": "New",
+  "taskTextPlaceholder": "What needs to be done...",
+  "importance": "Importance",
+  "importanceNone": "None",
+  "importanceLow": "Low",
+  "importanceHigh": "!! High",
+  "doUntil": "Do Until",
+  "deleteTask": "Delete",
+  "saveTask": "SAVE"
+}

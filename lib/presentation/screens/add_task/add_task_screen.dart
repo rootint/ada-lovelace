@@ -1,13 +1,12 @@
 import 'package:ada_lovelace/core/theme.dart';
 import 'package:ada_lovelace/data-domain/models/task.dart';
 import 'package:ada_lovelace/data-domain/providers/database_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../../core/logger.dart';
-
-const List<String> dropdownOptions = ['Нет', 'Низкий', '!! Высокий'];
+import '../../../core/logger.dart';
 
 class AddTaskScreen extends StatefulWidget {
   static String routeName = "/add-task";
@@ -18,30 +17,27 @@ class AddTaskScreen extends StatefulWidget {
 }
 
 class _AddTaskScreenState extends State<AddTaskScreen> {
-  Map<Importance, String> reverseConversionMap = {
-    Importance.none: 'Нет',
-    Importance.low: 'Низкий',
-    Importance.high: '!! Высокий',
-  };
   final _controller = TextEditingController();
-  String _dropdownValue = dropdownOptions.first;
+  String? _dropdownValue;
   bool _isDateSelected = false;
   DateTime? _date;
   bool firstBuild = true;
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  void saveTask(String? id) {
+  void saveTask(String? id, Map<Importance, String> importanceMap) {
     final taskProvider = Provider.of<DatabaseProvider>(context, listen: false);
+    late final Importance importance;
+    for (var item in importanceMap.keys) {
+      if (importanceMap[item] == _dropdownValue) {
+        importance = item;
+        break;
+      }
+    }
     if (id == null) {
-      taskProvider.saveTask(_controller.text, _dropdownValue, _date);
+      taskProvider.saveTask(_controller.text, importance, _date);
       Logger.addToLog(
           'saving task with ${_controller.text}, $_dropdownValue, $_date');
     } else {
-      taskProvider.saveTaskById(id, _controller.text, _dropdownValue, _date);
+      taskProvider.saveTaskById(id, _controller.text, importance, _date);
       Logger.addToLog('saving task with id $id');
     }
   }
@@ -51,7 +47,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     final databaseProvider =
         Provider.of<DatabaseProvider>(context, listen: false);
     final theme = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final id = ModalRoute.of(context)!.settings.arguments as String?;
+    final Map<Importance, String> importanceMap = {
+      Importance.none: l10n.importanceNone,
+      Importance.low: l10n.importanceLow,
+      Importance.high: l10n.importanceHigh,
+    };
     if (firstBuild && id != null) {
       Task task = databaseProvider.tasks[id]!;
       Logger.addToLog('initial build of AddTaskScreen');
@@ -59,9 +61,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         _controller.text = task.text;
         _date = task.doUntil;
         _isDateSelected = _date != null;
-        _dropdownValue = reverseConversionMap[task.importance]!;
+        _dropdownValue = importanceMap[task.importance]!;
       });
       firstBuild = false;
+    } else if (firstBuild) {
+      setState(() {
+        _dropdownValue = importanceMap.values.first;
+      });
     }
     return Scaffold(
       backgroundColor: theme.backPrimary,
@@ -86,12 +92,12 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               onPressed: _controller.text.isEmpty
                   ? null
                   : () {
-                      saveTask(id);
-                      Logger.addToLog('exited AddTaskScreen');
+                      saveTask(id, importanceMap);
+                      Logger.addToLog('exited AddTaskScreen, saved task with id: $id');
                       Navigator.of(context).pop();
                     },
               child: Text(
-                'СОХРАНИТЬ',
+                l10n.saveTask,
                 style: theme.button.copyWith(
                   color: _controller.text.isEmpty
                       ? theme.labelDisabled
@@ -120,7 +126,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   child: TextField(
                     controller: _controller,
                     decoration: InputDecoration.collapsed(
-                      hintText: 'Что надо сделать...',
+                      hintText: l10n.taskTextPlaceholder,
                       hintStyle: theme.body.copyWith(
                         color: theme.labelTertiary,
                       ),
@@ -134,24 +140,25 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                'Важность',
+                l10n.importance,
                 style: theme.body,
               ),
+              // TODO: change to PopupMenuButton
               DropdownButton<String>(
                 icon: null,
                 dropdownColor: theme.backElevated,
-                items: dropdownOptions.map<DropdownMenuItem<String>>(
+                items: importanceMap.values.map<DropdownMenuItem<String>>(
                   (String value) {
                     return DropdownMenuItem<String>(
                       value: value,
-                      child: value == "Нет"
+                      child: value == l10n.importanceNone
                           ? Text(
                               value,
                               style: theme.subhead.copyWith(
                                 color: theme.labelTertiary,
                               ),
                             )
-                          : value == 'Низкий'
+                          : value == l10n.importanceLow
                               ? Text(value, style: theme.subhead)
                               : Text(
                                   value,
@@ -184,7 +191,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Сделать до',
+                        l10n.doUntil,
                         style: theme.body,
                       ),
                       if (_isDateSelected && _date != null)
@@ -203,7 +210,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                             context: context,
                             initialDate: DateTime.now(),
                             firstDate: DateTime.now(),
-                            // lastDate: DateTime(DateTime.now().year + 100),
                             lastDate: DateTime(2300),
                           ).then(
                             (value) => setState(() {
@@ -248,7 +254,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        'Удалить',
+                        l10n.deleteTask,
                         style: theme.body.copyWith(
                           color: id == null ? theme.labelDisabled : theme.error,
                         ),

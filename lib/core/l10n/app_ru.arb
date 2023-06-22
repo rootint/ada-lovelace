@@ -1,0 +1,13 @@
+{
+    "appTitle": "Мои дела",
+    "tasksCompleted": "Выполнено — {tasksCompleted}",
+    "addNewText": "Новое",
+    "taskTextPlaceholder": "Что надо сделать...",
+    "importance": "Важность",
+    "importanceNone": "Нет",
+    "importanceLow": "Низкая",
+    "importanceHigh": "!! Высокая",
+    "doUntil": "Сделать до",
+    "deleteTask": "Удалить",
+    "saveTask": "СОХРАНИТЬ"
+  }

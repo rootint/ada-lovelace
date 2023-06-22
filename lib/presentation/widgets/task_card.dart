@@ -6,7 +6,7 @@ import '../../core/logger.dart';
 import '../../core/theme.dart';
 import '../../data-domain/models/task.dart';
 import '../../data-domain/providers/database_provider.dart';
-import '../screens/add_task_screen.dart';
+import '../screens/add_task/add_task_screen.dart';
 
 class TaskCard extends StatelessWidget {
   final Task task;

@@ -1,9 +1,9 @@
 import 'package:ada_lovelace/core/theme.dart';
 import 'package:ada_lovelace/data-domain/providers/theme_provider.dart';
-import 'package:ada_lovelace/presentation/screens/add_task_screen.dart';
-import 'package:ada_lovelace/presentation/screens/main_screen.dart';
-import 'package:flutter/foundation.dart';
+import 'package:ada_lovelace/presentation/screens/add_task/add_task_screen.dart';
+import 'package:ada_lovelace/presentation/screens/home/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'data-domain/providers/database_provider.dart';
@@ -26,7 +26,10 @@ class MyApp extends StatelessWidget {
       child: Consumer<ThemeProvider>(
         builder: (context, provider, _) => MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'TODO',
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          onGenerateTitle: (context) =>
+                AppLocalizations.of(context)!.appTitle,
           // themeMode: ThemeMode.system,
           themeMode: provider.currentTheme == null
               ? ThemeMode.system
