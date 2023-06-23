@@ -21,7 +21,6 @@ class TasksBloc extends Bloc<TasksEvent, TasksState> {
   Future<void> _getTasksListHandler(
       GetTasksListEvent event, Emitter<TasksState> emit) async {
     final response = await repo.getList();
-    print('I am here');
     emit(TasksLoaded(response));
   }
 

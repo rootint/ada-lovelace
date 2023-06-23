@@ -6,7 +6,7 @@ abstract class TasksState {}
 class TasksInitial extends TasksState {}
 
 class TasksLoaded extends TasksState {
-  final TasksList list;
+  final List<Task> list;
 
   TasksLoaded(this.list);
 }

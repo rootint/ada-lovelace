@@ -1,14 +1,18 @@
+import 'package:ada_lovelace/data/local/local_database_manager.dart';
 import 'package:ada_lovelace/data/network/dto/task_dto.dart';
 import 'package:ada_lovelace/data/network/dto/tasks_list_dto.dart';
+import 'package:ada_lovelace/domain/models/task.dart';
 import 'package:ada_lovelace/domain/models/task_response.dart';
 import 'package:ada_lovelace/domain/models/tasks_list.dart';
 import 'package:ada_lovelace/domain/repositories/tasks_repo.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 import '../../data/network/api/tasks_api.dart';
 
 class TasksRepoImpl extends TasksRepo {
   final TasksApi api;
-  TasksRepoImpl(this.api);
+  final LocalDatabaseManager dbManager;
+  TasksRepoImpl(this.api, this.dbManager);
 
   @override
   Future<TaskResponse> deleteTask(String id) async {
@@ -17,9 +21,11 @@ class TasksRepoImpl extends TasksRepo {
   }
 
   @override
-  Future<TasksList> getList() async {
+  Future<List<Task>> getList() async {
     final response = await api.getList();
-    return response;
+    await dbManager.saveList(response.tasks);
+    // final response = await dbManager.getList();
+    return response.tasks;
   }
 
   @override

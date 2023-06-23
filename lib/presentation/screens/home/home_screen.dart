@@ -35,7 +35,7 @@ class _MainScreenState extends State<MainScreen> {
           );
         }
         if (state is TasksLoaded) {
-          final tasks = state.list.tasks;
+          final tasks = state.list;
           int done = 0;
           for (var item in tasks) {
             if (item.done) {
