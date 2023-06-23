@@ -3,12 +3,12 @@ import 'package:ada_lovelace/core/theme.dart';
 import 'package:ada_lovelace/core/providers/theme_provider.dart';
 import 'package:ada_lovelace/presentation/screens/add_task/add_task_screen.dart';
 import 'package:ada_lovelace/presentation/screens/home/widgets/title_bar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../domain/models/task.dart';
-import '../../../core/providers/database_provider.dart';
+import '../../bloc/tasks/tasks_bloc.dart';
 import '../../widgets/task_card.dart';
 
 class MainScreen extends StatefulWidget {
@@ -25,91 +25,99 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final theme = AppTheme.of(context);
-    return Scaffold(
-      backgroundColor: theme.backPrimary,
-      body: Consumer<DatabaseProvider>(
-        builder: (context, value, child) {
-          Map<String, Task> tasks = {};
-          if (_isDoneVisible) {
-            tasks = value.tasks;
-          } else {
-            for (var item in value.tasks.entries) {
-              if (!item.value.done) {
-                tasks[item.key] = item.value;
-              }
+    return BlocBuilder<TasksBloc, TasksState>(
+      builder: (context, state) {
+        if (state is TasksInitial) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator.adaptive(),
+            ),
+          );
+        }
+        if (state is TasksLoaded) {
+          final tasks = state.list.tasks;
+          int done = 0;
+          for (var item in tasks) {
+            if (item.done) {
+              done += 1;
             }
           }
-          return SafeArea(
-            bottom: false,
-            child: CustomScrollView(
-              slivers: [
-                SliverPersistentHeader(
-                  pinned: true,
-                  delegate: TitleBar(
-                    value: value.countDone(),
-                    isDoneVisible: _isDoneVisible,
-                    onPressed: () {
-                      setState(() {
-                        Logger.addToLog('toggled done visibility');
-                        _isDoneVisible = !_isDoneVisible;
-                      });
-                    },
+          return Scaffold(
+            backgroundColor: theme.backPrimary,
+            body: SafeArea(
+              bottom: false,
+              child: CustomScrollView(
+                slivers: [
+                  SliverPersistentHeader(
+                    pinned: true,
+                    delegate: TitleBar(
+                      value: done,
+                      isDoneVisible: _isDoneVisible,
+                      onPressed: () {
+                        setState(() {
+                          Logger.addToLog('toggled done visibility');
+                          _isDoneVisible = !_isDoneVisible;
+                        });
+                      },
+                    ),
+                  ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        if (index == 0) {
+                          return const ListTopPaddingWidget();
+                        }
+                        if (index == tasks.length + 1) {
+                          return const ListBottomPaddingWidget();
+                        }
+                        return TaskCard(task: tasks[index - 1]);
+                      },
+                      childCount: tasks.length + 2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            floatingActionButton: Row(
+              children: [
+                const SizedBox(width: 32),
+                FloatingActionButton(
+                  heroTag: 'theme',
+                  onPressed: () {
+                    if (themeProvider.currentTheme == ThemeType.dark) {
+                      Logger.addToLog('changed theme to light theme');
+                      themeProvider.setTheme(ThemeType.light);
+                    } else {
+                      Logger.addToLog('changed theme to dark theme');
+                      themeProvider.setTheme(ThemeType.dark);
+                    }
+                  },
+                  backgroundColor: theme.backSecondary,
+                  child: Icon(
+                    themeProvider.currentTheme == null
+                        ? Icons.auto_mode
+                        : themeProvider.currentTheme == ThemeType.dark
+                            ? Icons.nightlight_outlined
+                            : Icons.sunny,
+                    color: theme.primary,
                   ),
                 ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      if (index == 0) {
-                        return const ListTopPaddingWidget();
-                      }
-                      if (index == tasks.length + 1) {
-                        return const ListBottomPaddingWidget();
-                      }
-                      return TaskCard(task: tasks.values.toList()[index - 1]);
-                    },
-                    childCount: tasks.length + 2,
-                  ),
+                const Spacer(),
+                FloatingActionButton(
+                  heroTag: 'add',
+                  onPressed: () {
+                    Logger.addToLog('opened AddTaskScreen');
+                    Navigator.of(context).pushNamed(AddTaskScreen.routeName);
+                  },
+                  child: const Icon(Icons.add),
                 ),
               ],
             ),
           );
-        },
-      ),
-      floatingActionButton: Row(
-        children: [
-          const SizedBox(width: 32),
-          FloatingActionButton(
-            heroTag: 'theme',
-            onPressed: () {
-              if (themeProvider.currentTheme == ThemeType.dark) {
-                Logger.addToLog('changed theme to light theme');
-                themeProvider.setTheme(ThemeType.light);
-              } else {
-                Logger.addToLog('changed theme to dark theme');
-                themeProvider.setTheme(ThemeType.dark);
-              }
-            },
-            backgroundColor: theme.backSecondary,
-            child: Icon(
-              themeProvider.currentTheme == null
-                  ? Icons.auto_mode
-                  : themeProvider.currentTheme == ThemeType.dark
-                      ? Icons.nightlight_outlined
-                      : Icons.sunny,
-              color: theme.primary,
-            ),
-          ),
-          const Spacer(),
-          FloatingActionButton(
-            heroTag: 'add',
-            onPressed: () {
-              Logger.addToLog('opened AddTaskScreen');
-              Navigator.of(context).pushNamed(AddTaskScreen.routeName);
-            },
-            child: const Icon(Icons.add),
-          ),
-        ],
-      ),
+        }
+        Logger.addToLog('unexpected state at HomeScreen: ${state.toString()}');
+        return const Text('Error');
+      },
     );
   }
 }

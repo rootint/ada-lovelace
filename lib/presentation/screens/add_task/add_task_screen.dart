@@ -24,22 +24,22 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   bool firstBuild = true;
 
   void saveTask(String? id, Map<Importance, String> importanceMap) {
-    final taskProvider = Provider.of<DatabaseProvider>(context, listen: false);
-    late final Importance importance;
-    for (var item in importanceMap.keys) {
-      if (importanceMap[item] == _dropdownValue) {
-        importance = item;
-        break;
-      }
-    }
-    if (id == null) {
-      taskProvider.saveTask(_controller.text, importance, _date);
-      Logger.addToLog(
-          'saving task with ${_controller.text}, $_dropdownValue, $_date');
-    } else {
-      taskProvider.saveTaskById(id, _controller.text, importance, _date);
-      Logger.addToLog('saving task with id $id');
-    }
+    // final taskProvider = Provider.of<DatabaseProvider>(context, listen: false);
+    // late final Importance importance;
+    // for (var item in importanceMap.keys) {
+    //   if (importanceMap[item] == _dropdownValue) {
+    //     importance = item;
+    //     break;
+    //   }
+    // }
+    // if (id == null) {
+    //   taskProvider.saveTask(_controller.text, importance, _date);
+    //   Logger.addToLog(
+    //       'saving task with ${_controller.text}, $_dropdownValue, $_date');
+    // } else {
+    //   taskProvider.saveTaskById(id, _controller.text, importance, _date);
+    //   Logger.addToLog('saving task with id $id');
+    // }
   }
 
   // TODO: fix theming in the DatePicker
@@ -61,31 +61,31 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final databaseProvider =
-        Provider.of<DatabaseProvider>(context, listen: false);
+    // final databaseProvider =
+    //     Provider.of<DatabaseProvider>(context, listen: false);
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final id = ModalRoute.of(context)!.settings.arguments as String?;
     final Map<Importance, String> importanceMap = {
-      Importance.none: l10n.importanceNone,
+      Importance.basic: l10n.importanceNone,
       Importance.low: l10n.importanceLow,
-      Importance.high: l10n.importanceHigh,
+      Importance.important: l10n.importanceHigh,
     };
-    if (firstBuild && id != null) {
-      Task task = databaseProvider.tasks[id]!;
-      Logger.addToLog('initial build of AddTaskScreen');
-      setState(() {
-        _controller.text = task.text;
-        _date = task.doUntil;
-        _isDateSelected = _date != null;
-        _dropdownValue = importanceMap[task.importance]!;
-      });
-      firstBuild = false;
-    } else if (firstBuild) {
-      setState(() {
-        _dropdownValue = importanceMap.values.first;
-      });
-    }
+    // if (firstBuild && id != null) {
+    //   Task task = databaseProvider.tasks[id]!;
+    //   Logger.addToLog('initial build of AddTaskScreen');
+    //   setState(() {
+    //     _controller.text = task.text;
+    //     _date = task.doUntil;
+    //     _isDateSelected = _date != null;
+    //     _dropdownValue = importanceMap[task.importance]!;
+    //   });
+    //   firstBuild = false;
+    // } else if (firstBuild) {
+    //   setState(() {
+    //     _dropdownValue = importanceMap.values.first;
+    //   });
+    // }
     return Scaffold(
       backgroundColor: theme.backPrimary,
       appBar: AppBar(
@@ -245,7 +245,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     ? null
                     : () {
                         Logger.addToLog('task with $id is deleted');
-                        databaseProvider.deleteTask(id);
+                        // databaseProvider.deleteTask(id);
                         Logger.addToLog('exited AddTaskScreen');
                         Navigator.of(context).pop();
                       },
